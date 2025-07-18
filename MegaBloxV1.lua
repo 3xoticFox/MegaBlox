@@ -7,13 +7,13 @@
 ██║░╚═╝░██║██║░░██║██████╔╝███████╗  ██████╦╝░░░██║░░░  ███████╗██║░░░░░╚█████╔╝██╔╝╚██╗███████╗██║░░██║
 ╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═════╝░╚══════╝  ╚═════╝░░░░╚═╝░░░  ╚══════╝╚═╝░░░░░░╚════╝░╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝
 
+
  d888b  db    db d888888b      .d888b.      db      db    db  .d8b.  
 88' Y8b 88    88   `88'        VP  `8D      88      88    88 d8' `8b 
 88      88    88    88            odD'      88      88    88 88ooo88 
 88  ooo 88    88    88          .88'        88      88    88 88~~~88 
 88. ~8~ 88b  d88   .88.        j88.         88booo. 88b  d88 88   88    @uniquadev
  Y888P  ~Y8888P' Y888888P      888888D      Y88888P ~Y8888P' YP   YP  CONVERTER 
-
 ]=]
 
 -- Instances: 67 | Scripts: 15 | Modules: 0 | Tags: 0
@@ -726,7 +726,7 @@ G2L["40"]["BackgroundTransparency"] = 1;
 G2L["40"]["RichText"] = true;
 G2L["40"]["Size"] = UDim2.new(0, 72, 0, 30);
 G2L["40"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["40"]["Text"] = [[1.0.1]];
+G2L["40"]["Text"] = [[1.0.2]];
 G2L["40"]["Name"] = [[Version]];
 G2L["40"]["Position"] = UDim2.new(0.82469, 0, 0.80769, 0);
 
@@ -1813,7 +1813,7 @@ local script = G2L["2a"];
 	button.TextColor3 = Color3.new(1, 1, 1)
 	
 	local enabled = false
-	local sessionTimeLabel = nil
+	local serverTimeLabel = nil
 	local updateConnection = nil
 	
 	-- Order of status labels
@@ -1821,7 +1821,7 @@ local script = G2L["2a"];
 	    "StatusMessage", -- Message
 	    "FPSDisplay",    -- FPS Counter
 	    "CPSDisplay",    -- CPS Counter
-	    "sessionTimeDisplay", -- Session Time
+	    "ServerTimeDisplay", -- Server Time
 		"JumpsDisplay",   -- Jumps
 		"Clock"   -- Clock
 	}
@@ -1871,8 +1871,8 @@ local script = G2L["2a"];
 	    end
 	end
 	
-	-- Get session start time (best effort: use ReplicatedFirst creation time)
-	local sessionStartTime = tick()
+	-- Get server start time (best effort: use ReplicatedFirst creation time)
+	local serverStartTime = tick()
 	if ReplicatedFirst then
 	    -- If ReplicatedFirst has a property that can be used, use it (not always possible)
 	    -- Otherwise, just use tick() at script start as an approximation
@@ -1887,43 +1887,43 @@ local script = G2L["2a"];
 	    return string.format("%02d:%02d:%02d", hours, mins, secs)
 	end
 	
-	local function enablesessionTime()
+	local function enableServerTime()
 	    button.TextColor3 = Color3.new(0.6666667, 0.333333, 1)
-	    if not sessionTimeLabel then
+	    if not serverTimeLabel then
 	        local statusPlace = getStatusPlace()
 	        if statusPlace then
-	            sessionTimeLabel = Instance.new("TextLabel")
-	            sessionTimeLabel.Name = "sessionTimeDisplay"
-	            sessionTimeLabel.BackgroundTransparency = 1
-	            sessionTimeLabel.Size = UDim2.new(0, 250, 0, 40)
-	            sessionTimeLabel.Font = Enum.Font.SourceSansBold
-	            sessionTimeLabel.TextSize = 32
-	            sessionTimeLabel.TextColor3 = Color3.new(0.6666667, 0.333333, 1)
-	            sessionTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
-	            sessionTimeLabel.TextYAlignment = Enum.TextYAlignment.Top
-	            sessionTimeLabel.Parent = statusPlace
+	            serverTimeLabel = Instance.new("TextLabel")
+	            serverTimeLabel.Name = "ServerTimeDisplay"
+	            serverTimeLabel.BackgroundTransparency = 1
+	            serverTimeLabel.Size = UDim2.new(0, 250, 0, 40)
+	            serverTimeLabel.Font = Enum.Font.SourceSansBold
+	            serverTimeLabel.TextSize = 32
+	            serverTimeLabel.TextColor3 = Color3.new(0.6666667, 0.333333, 1)
+	            serverTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+	            serverTimeLabel.TextYAlignment = Enum.TextYAlignment.Top
+	            serverTimeLabel.Parent = statusPlace
 	            updateStatusLabelPositions()
 	        end
 	    end
 	
 	    -- Update the label every second
 	    updateConnection = RunService.RenderStepped:Connect(function()
-	        if sessionTimeLabel then
-	            local uptime = tick() - sessionStartTime
-	            sessionTimeLabel.Text = "Session Time: " .. formatTime(uptime)
+	        if serverTimeLabel then
+	            local uptime = tick() - serverStartTime
+	            serverTimeLabel.Text = "Session Time: " .. formatTime(uptime)
 	        end
 	    end)
 	end
 	
-	local function disablesessionTime()
+	local function disableServerTime()
 	    button.TextColor3 = Color3.new(1, 1, 1)
 	    if updateConnection then
 	        updateConnection:Disconnect()
 	        updateConnection = nil
 	    end
-	    if sessionTimeLabel then
-	        sessionTimeLabel:Destroy()
-	        sessionTimeLabel = nil
+	    if serverTimeLabel then
+	        serverTimeLabel:Destroy()
+	        serverTimeLabel = nil
 	        updateStatusLabelPositions()
 	    end
 	end
@@ -1931,9 +1931,9 @@ local script = G2L["2a"];
 	button.MouseButton1Click:Connect(function()
 	    enabled = not enabled
 	    if enabled then
-	        enablesessionTime()
+	        enableServerTime()
 	    else
-	        disablesessionTime()
+	        disableServerTime()
 	    end
 	end)
 	
@@ -1943,11 +1943,11 @@ local script = G2L["2a"];
 	    if not statusPlace then return end
 	
 	    -- Only connect once
-	    if statusPlace:FindFirstChild("__sessionTimeStackingConnection") then return end
+	    if statusPlace:FindFirstChild("__ServerTimeStackingConnection") then return end
 	
 	    -- Use a dummy object to mark connection
 	    local marker = Instance.new("ObjectValue")
-	    marker.Name = "__sessionTimeStackingConnection"
+	    marker.Name = "__ServerTimeStackingConnection"
 	    marker.Parent = statusPlace
 	
 	    statusPlace.ChildAdded:Connect(function(child)
@@ -2176,7 +2176,7 @@ local script = G2L["35"];
 	    "StatusMessage", -- Message
 	    "FPSDisplay",    -- FPS Counter
 	    "CPSDisplay",    -- CPS Counter
-	    "SessionTimeDisplay", -- Server Time
+	    "ServerTimeDisplay", -- Server Time
 		"JumpsDisplay",   -- Jumps
 		"Clock"   -- Clock
 	}
@@ -2366,7 +2366,7 @@ local script = G2L["38"];
 		"StatusMessage", -- Message
 		"FPSDisplay",    -- FPS Counter
 		"CPSDisplay",    -- CPS Counter
-		"SessionTimeDisplay", -- Server Time
+		"ServerTimeDisplay", -- Server Time
 		"JumpsDisplay",   -- Jumps
 		"Clock"   -- Clock
 	}
@@ -2574,7 +2574,7 @@ local script = G2L["3b"];
 		"StatusMessage",     -- Message
 		"FPSDisplay",        -- FPS Counter
 		"CPSDisplay",        -- CPS Counter
-		"SessionTimeDisplay", -- Server Time
+		"ServerTimeDisplay", -- Server Time
 		"JumpsDisplay",      -- Jumps
 		"ClockLabel"         -- Clock (updated to match the clockLabel.Name)
 	}
