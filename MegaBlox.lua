@@ -191,7 +191,7 @@ G2L["f"]["BackgroundTransparency"] = 1;
 G2L["f"]["RichText"] = true;
 G2L["f"]["Size"] = UDim2.new(0, 72, 0, 30);
 G2L["f"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["f"]["Text"] = [[1.0.2]];
+G2L["f"]["Text"] = [[1.1]];
 G2L["f"]["Name"] = [[Version]];
 G2L["f"]["Position"] = UDim2.new(0.82469, 0, 0.80769, 0);
 
